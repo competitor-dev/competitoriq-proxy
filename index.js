@@ -1,11 +1,15 @@
 const https = require("https");
+const http = require("http");
 
-const handler = (req, res) => {
+const server = http.createServer((req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-  if (req.method === "OPTIONS") return res.end();
+  if (req.method === "OPTIONS") {
+    res.writeHead(200);
+    return res.end();
+  }
 
   let body = "";
   req.on("data", chunk => body += chunk);
@@ -21,7 +25,10 @@ const handler = (req, res) => {
     };
 
     const proxy = https.request(options, lfRes => {
-      res.writeHead(lfRes.statusCode, { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" });
+      res.writeHead(lfRes.statusCode, {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*"
+      });
       lfRes.pipe(res);
     });
 
@@ -29,6 +36,7 @@ const handler = (req, res) => {
     proxy.write(body);
     proxy.end();
   });
-};
+});
 
-module.exports = handler;
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => console.log(`Proxy running on port ${PORT}`));
