@@ -39,4 +39,4 @@ const server = http.createServer((req, res) => {
 });
 
 const PORT = process.env.PORT || 8080;
-server.listen(PORT, () => console.log(`Proxy running on port ${PORT}`));
+server.listen(PORT, "0.0.0.0", () => console.log(`Proxy running on port ${PORT}`));
